@@ -47,6 +47,9 @@ async def test_url():
 
 @app.post('/encryption_algorithms', status_code=status.HTTP_201_CREATED)
 async def create_algorithm(algorithm: EncryptionAlgorithm):
+    for algoritmo in algoritmos_disponibles:
+        if algoritmo.id == algorithm.id:
+            raise HTTPException(status_code=403, detail=f'Algorithm with ID {algorithm.id} already exists')
     algoritmos_disponibles.append(algorithm)
     return algorithm
 
