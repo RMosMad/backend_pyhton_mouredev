@@ -1,5 +1,3 @@
-from fastapi import FastAPI
-
 from enum import Enum
 import os
 import encription_algorithms
@@ -12,8 +10,6 @@ from starlette.responses import Response
 from starlette import status
 
 # import app
-
-app = FastAPI(debug=True)
 
 class EncryptionAlgorithm(BaseModel):
     id: int
@@ -78,9 +74,10 @@ async def update_algorithm(algorithm_id: int, algorithm_details: EncryptionAlgor
 @app.delete('/encryption_algorithms/{algorithm_id}', status_code=status.HTTP_204_NO_CONTENT)
 async def delete_algorithm(algorithm_id: int):
     for index, algorithm in enumerate(algoritmos_disponibles):
+        print(index, algorithm)
         if algorithm.id == algorithm_id:
             algoritmos_disponibles.pop(index)
-            return Response(status_code=status.HTTP_204_NO_CONTENT)
+            return Response(status_code=status.HTTP_204_NO_CONTENT.value)
     raise HTTPException(status_code=404, detail=f'Algorithm with ID {algorithm_id} not found')
 
 
