@@ -6,7 +6,6 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 
 from fastapi import HTTPException
-from starlette.responses import Response
 from starlette import status
 
 
@@ -60,11 +59,16 @@ async def get_algorithm(algorithm_id: int):
         # if algoritmo['id'] == algorithm_id:
         if algoritmo.id == algorithm_id:
             return algoritmo
-    raise HTTPException(status_code=404, detail=f'Order with ID {algorithm_id} not found')
+    raise HTTPException(status_code=404, detail=f'Algorithm with ID {algorithm_id} not found')
 
 
-# @app.put('encryption_algorithms/{algorithm_id}')
-# async def update_algorithm(algorithm_id: int)
+@app.put('/encryption_algorithms/{algorithm_id}')
+async def update_algorithm(algorithm_id: int, algorithm_details: EncryptionAlgorithm):
+    for index, algoritmo in enumerate(algoritmos_disponibles):
+        if algoritmo.id == algorithm_id:
+            # algoritmo[index] = algorithm_details
+            algoritmos_disponibles.append(algorithm_details)
+    raise HTTPException(status_code=404, detail=f'Algorithm with ID {algorithm_id} not found')
 
 
 @app.get('/encryption_algorithms/encrypt/{algorithm_id}')
