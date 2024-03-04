@@ -5,6 +5,10 @@ import encription_algorithms
 from fastapi import FastAPI
 from pydantic import BaseModel
 
+from fastapi import HTTPException
+from starlette.responses import Response
+from starlette import status
+
 
 app = FastAPI()
 
@@ -39,9 +43,28 @@ async def test_url():
     return {'url': os. getcwd()}
 
 
+@app.post('/encryption_algorithms', status_code=status.HTTP_201_CREATED)
+async def create_algorithm(algorithm: EncryptionAlgorithm):
+    algoritmos_disponibles.append(algorithm)
+    return algorithm
+
+
 @app.get('/encryption_algorithms')
-async def encryption_algorithms():
+async def get_algorithms():
     return algoritmos_disponibles
+
+
+@app.get('/encryption_algorithms/{algorithm_id}')
+async def get_algorithm(algorithm_id: int):
+    for algoritmo in algoritmos_disponibles:
+        # if algoritmo['id'] == algorithm_id:
+        if algoritmo.id == algorithm_id:
+            return algoritmo
+    raise HTTPException(status_code=404, detail=f'Order with ID {algorithm_id} not found')
+
+
+# @app.put('encryption_algorithms/{algorithm_id}')
+# async def update_algorithm(algorithm_id: int)
 
 
 @app.get('/encryption_algorithms/encrypt/{algorithm_id}')
@@ -71,6 +94,7 @@ async def decrypt_message(algorithm: AvailableAlgorithms, message: str, t_key: s
         encripted_message = encription_algorithms.transposition_cipher(message, t_key, 'decrypt')
 
     return {'encripted_message': encripted_message}
+
 
 
 
