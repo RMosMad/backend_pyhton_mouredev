@@ -15,6 +15,7 @@ from starlette import status
 
 app = FastAPI(debug=True)
 
+
 class EncryptionAlgorithm(BaseModel):
     id: int
     name: str
@@ -45,7 +46,7 @@ async def test_url():
     return {'url': os. getcwd()}
 
 
-@app.post('/encryption_algorithms', status_code=status.HTTP_201_CREATED)
+@app.post('/encryption_algorithms', response_model=EncryptionAlgorithm, status_code=status.HTTP_201_CREATED)
 async def create_algorithm(algorithm: EncryptionAlgorithm):
     for algoritmo in algoritmos_disponibles:
         if algoritmo.id == algorithm.id:
@@ -59,7 +60,7 @@ async def get_algorithms():
     return algoritmos_disponibles
 
 
-@app.get('/encryption_algorithms/{algorithm_id}')
+@app.get('/encryption_algorithms/{algorithm_id}', response_model=EncryptionAlgorithm)
 async def get_algorithm(algorithm_id: int):
     for algoritmo in algoritmos_disponibles:
         # if algoritmo['id'] == algorithm_id:
@@ -68,7 +69,7 @@ async def get_algorithm(algorithm_id: int):
     raise HTTPException(status_code=404, detail=f'Algorithm with ID {algorithm_id} not found')
 
 
-@app.put('/encryption_algorithms/{algorithm_id}')
+@app.put('/encryption_algorithms/{algorithm_id}', response_model=EncryptionAlgorithm)
 async def update_algorithm(algorithm_id: int, algorithm_details: EncryptionAlgorithm):
     for index, algoritmo in enumerate(algoritmos_disponibles):
         if algoritmo.id == algorithm_id:
