@@ -2,12 +2,19 @@ from fastapi import FastAPI, HTTPException, Depends
 from pydantic import BaseModel
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
+from jose import JWTError, jwt
+from passlib.context import CryptContext
+
+ALGORITHM = 'HS256'
+
 from starlette.responses import Response
 from starlette import status
 
 app = FastAPI(debug=True)
 
 oauth2 = OAuth2PasswordBearer(tokenUrl='login')
+
+crypt = CryptContext(schemes=['bcrypt'])
 
 
 class User(BaseModel):
@@ -74,7 +81,22 @@ users_db = {
 }
 
 
+def search_user_db(email: str):
+    if email in users_db:
+        return UserDB(**users_db[email])
 
+
+@app.post('/login')
+async def login(form: OAuth2PasswordRequestForm = Depends()):
+    user_db = users_db.get(form.username)
+    if not user_db:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'El usuario {form.username} no se encuentra registrado')
+
+    user = search_user_db(form.username)
+    if not form.password == user.password:
+        raise HTTPException(status_code=400, detail=f'Contraseña incorrecta')
+
+    return {'access_token': user.email, 'token_type': 'bearer'}
 
 
 
