@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
@@ -6,7 +6,7 @@ from fastapi import HTTPException
 from starlette.responses import Response
 from starlette import status
 
-app = FastAPI(debug=True)
+router = APIRouter()
 
 oauth2 = OAuth2PasswordBearer(tokenUrl='login')
 
@@ -100,7 +100,7 @@ async def current_user(token: str = Depends(oauth2)):
     return user
 
 
-@app.post('/login')
+@router.post('/login')
 async def login(form: OAuth2PasswordRequestForm = Depends()):
     user_db = users_db.get(form.username)
     if not user_db:
@@ -113,17 +113,17 @@ async def login(form: OAuth2PasswordRequestForm = Depends()):
     return {'access_token': user.email, 'token_type': 'bearer'}
 
 
-@app.get('/')
+@router.get('/')
 async def root():
     return "Users Authentication API"
 
 
-@app.get('/users/me')
+@router.get('/users/me')
 async def get_me(user: User = Depends(current_user)):
     return user
 
 
-@app.post('/users', response_model=User, status_code=status.HTTP_201_CREATED)
+@router.post('/users', response_model=User, status_code=status.HTTP_201_CREATED)
 async def create_user(user_id: User):
     for user in users_list:
         if user.id == user_id.id:
@@ -132,12 +132,12 @@ async def create_user(user_id: User):
     return user_id
 
 
-@app.get('/users')
+@router.get('/users')
 async def get_users():
     return users_list
 
 
-@app.get('/users/{user_id}', response_model=User)
+@router.get('/users/{user_id}', response_model=User)
 async def get_user(user_id: int):
     for user in users_list:
         if user.id == user_id:
@@ -145,7 +145,7 @@ async def get_user(user_id: int):
     raise HTTPException(status_code=404, detail=f'Algorithm with ID {user_id} not found')
 
 
-@app.put('/users/{user_id}', response_model=User)
+@router.put('/users/{user_id}', response_model=User)
 async def update_user(user_id: int, user_details: User):
     for index, user in enumerate(users_list):
         if user.id == user_id:
@@ -155,7 +155,7 @@ async def update_user(user_id: int, user_details: User):
     raise HTTPException(status_code=404, detail=f'Algorithm with ID {user_id} not found')
 
 
-@app.delete('/users/{user_id}', status_code=status.HTTP_204_NO_CONTENT)
+@router.delete('/users/{user_id}', status_code=status.HTTP_204_NO_CONTENT)
 async def delete_algorithm(user_id: int):
     for index, user in enumerate(users_list):
         if user.id == user_id:

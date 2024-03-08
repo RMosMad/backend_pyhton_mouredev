@@ -1,8 +1,7 @@
-from fastapi import FastAPI
-
 from enum import Enum
 import os
-import encription_algorithms
+from algorithms import encription_algorithms
+from routers import jwt_auth_users
 
 from fastapi import FastAPI
 from pydantic import BaseModel
@@ -11,9 +10,10 @@ from fastapi import HTTPException
 from starlette.responses import Response
 from starlette import status
 
-# import app
 
 app = FastAPI(debug=True)
+
+app.include_router(jwt_auth_users.router)
 
 
 class EncryptionAlgorithm(BaseModel):
@@ -117,7 +117,9 @@ async def decrypt_message(algorithm: AvailableAlgorithms, message: str, t_key: s
     return {'encripted_message': encripted_message}
 
 
-
+if __name__ == '__main__':
+    import uvicorn
+    uvicorn.run(app, host='127.0.0.1', port=8080)
 
 
 
