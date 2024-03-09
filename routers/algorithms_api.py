@@ -1,9 +1,8 @@
 from enum import Enum
 import os
 from algorithms import encription_algorithms
-from routers import jwt_auth_users
 
-from fastapi import FastAPI
+from fastapi import APIRouter
 from pydantic import BaseModel
 
 from fastapi import HTTPException
@@ -11,9 +10,7 @@ from starlette.responses import Response
 from starlette import status
 
 
-app = FastAPI(debug=True)
-
-app.include_router(jwt_auth_users.router)
+router = APIRouter()
 
 
 class EncryptionAlgorithm(BaseModel):
@@ -36,17 +33,7 @@ class AvailableAlgorithms(str, Enum):
     transposition_cipher = 'transposition_cipher'
 
 
-@app.get('/')
-async def root():
-    return "Hello World from FastAPI"
-
-
-@app.get('/test')
-async def test_url():
-    return {'url': os. getcwd()}
-
-
-@app.post('/encryption_algorithms', response_model=EncryptionAlgorithm, status_code=status.HTTP_201_CREATED)
+@router.post('/encryption_algorithms', response_model=EncryptionAlgorithm, status_code=status.HTTP_201_CREATED)
 async def create_algorithm(algorithm: EncryptionAlgorithm):
     for algoritmo in algoritmos_disponibles:
         if algoritmo.id == algorithm.id:
@@ -55,12 +42,12 @@ async def create_algorithm(algorithm: EncryptionAlgorithm):
     return algorithm
 
 
-@app.get('/encryption_algorithms')
+@router.get('/encryption_algorithms')
 async def get_algorithms():
     return algoritmos_disponibles
 
 
-@app.get('/encryption_algorithms/{algorithm_id}', response_model=EncryptionAlgorithm)
+@router.get('/encryption_algorithms/{algorithm_id}', response_model=EncryptionAlgorithm)
 async def get_algorithm(algorithm_id: int):
     for algoritmo in algoritmos_disponibles:
         # if algoritmo['id'] == algorithm_id:
@@ -69,7 +56,7 @@ async def get_algorithm(algorithm_id: int):
     raise HTTPException(status_code=404, detail=f'Algorithm with ID {algorithm_id} not found')
 
 
-@app.put('/encryption_algorithms/{algorithm_id}', response_model=EncryptionAlgorithm)
+@router.put('/encryption_algorithms/{algorithm_id}', response_model=EncryptionAlgorithm)
 async def update_algorithm(algorithm_id: int, algorithm_details: EncryptionAlgorithm):
     for index, algoritmo in enumerate(algoritmos_disponibles):
         if algoritmo.id == algorithm_id:
@@ -79,7 +66,7 @@ async def update_algorithm(algorithm_id: int, algorithm_details: EncryptionAlgor
     raise HTTPException(status_code=404, detail=f'Algorithm with ID {algorithm_id} not found')
 
 
-@app.delete('/encryption_algorithms/{algorithm_id}', status_code=status.HTTP_204_NO_CONTENT)
+@router.delete('/encryption_algorithms/{algorithm_id}', status_code=status.HTTP_204_NO_CONTENT)
 async def delete_algorithm(algorithm_id: int):
     for index, algorithm in enumerate(algoritmos_disponibles):
         if algorithm.id == algorithm_id:
@@ -88,7 +75,7 @@ async def delete_algorithm(algorithm_id: int):
     raise HTTPException(status_code=404, detail=f'Algorithm with ID {algorithm_id} not found')
 
 
-@app.get('/encryption_algorithms/encrypt/{algorithm_id}')
+@router.get('/encryption_algorithms/encrypt/{algorithm_id}')
 async def encrypt_message(algorithm: AvailableAlgorithms, message: str, t_key: str, key: int = 3):
     encripted_message = ''
     if algorithm is AvailableAlgorithms.reverse_cipher:
@@ -102,7 +89,7 @@ async def encrypt_message(algorithm: AvailableAlgorithms, message: str, t_key: s
     return {'encripted_message': encripted_message}
 
 
-@app.get('/encryption_algorithms/decrypt/{algorithm_id}')
+@router.get('/encryption_algorithms/decrypt/{algorithm_id}')
 async def decrypt_message(algorithm: AvailableAlgorithms, message: str, t_key: str, key: int = 3):
     encripted_message = ''
     if algorithm is AvailableAlgorithms.reverse_cipher:
@@ -115,9 +102,6 @@ async def decrypt_message(algorithm: AvailableAlgorithms, message: str, t_key: s
         encripted_message = encription_algorithms.transposition_cipher(message, t_key, 'decrypt')
 
     return {'encripted_message': encripted_message}
-
-
-
 
 
 
