@@ -141,13 +141,10 @@ def transposition_cipher(message: str, key: str, mode: str) -> str:
 
         return decrypted_cipher
 
+# if __name__ == '__main__':
+#     mensaje = input('Mensaje a cifrar: ')
 
-if __name__ == '__main__':
-    # mensaje = input('Mensaje a cifrar: ')
-
-    # print(f'Mensaje cifrado: {transposition_cipher(mensaje, "HACK", "decrypt")}')
-
-    print(type(3) == int)
+#     print(f'Mensaje cifrado: {caesar_cipher(mensaje, 3, "decrypt")}')
 
 
 
