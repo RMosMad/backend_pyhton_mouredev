@@ -24,7 +24,7 @@ async def root():
     redis.incr('hits')
     counter = str(redis.get('hits'),'utf-8')
     
-    return f"This webpage has been viewed {counter} time(s)"
+    return f"This webpage has been viewed: {counter} time(s)"
 
 
 @app.get('/test')
