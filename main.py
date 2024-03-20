@@ -1,3 +1,5 @@
+import os
+
 from routers import algorithms_api, jwt_auth_users
 
 from fastapi import FastAPI
@@ -16,7 +18,7 @@ app.include_router(jwt_auth_users.router)
 
 @app.get('/')
 async def root():
-    return "Hello World from FastAPI"
+    return "Hello World from FastAPI. Volume Docker test"
 
 
 @app.get('/test')
@@ -24,9 +26,9 @@ async def test_url():
     return {'url': os. getcwd()}
 
 
-# if __name__ == '__main__':
-#     import uvicorn
-#     uvicorn.run(app, host='127.0.0.1', port=8080)
+if __name__ == '__main__':
+    import uvicorn
+    uvicorn.run(app, host='127.0.0.1', port=8080)
 
 
 
